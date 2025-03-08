@@ -16,11 +16,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.0' # Sesuaikan dengan versi terbaru
-          cache: true
-
-      - name: Enable Flutter
-        run: flutter doctor
+          flutter-version: '3.16.0' # Sesuaikan dengan versi Flutter terbaru
 
       - name: Install Dependencies
         run: flutter pub get
@@ -29,7 +25,7 @@ jobs:
         run: flutter build apk --release
 
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2 # Turunkan ke v2 jika v3 bermasalah
         with:
           name: flutter-apk
           path: build/app/outputs/flutter-apk/app-release.apk
