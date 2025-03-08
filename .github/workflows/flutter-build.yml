@@ -16,7 +16,11 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          flutter-version: '3.16.2'  # Ganti dengan versi terbaru jika perlu
+          cache: true
+
+      - name: Verify Flutter Installation
+        run: flutter doctor -v
 
       - name: Find or Create Flutter Project
         id: setup_project
