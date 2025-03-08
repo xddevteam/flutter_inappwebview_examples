@@ -10,11 +10,6 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Cleanup Cache
-        run: |
-          sudo rm -rf $HOME/.npm
-          sudo rm -rf $HOME/.cache
-
       - name: Checkout Repository
         uses: actions/checkout@v3
 
@@ -23,14 +18,32 @@ jobs:
         with:
           flutter-version: '3.16.0'
 
+      - name: Find or Create Flutter Project
+        id: setup_project
+        run: |
+          echo "🔍 Checking for existing Flutter project..."
+          PROJECT_DIR=$(find . -name "pubspec.yaml" -exec dirname {} \;)
+          
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "⚠️ No Flutter project found! Creating a new one..."
+            flutter create my_flutter_app
+            PROJECT_DIR="my_flutter_app"
+          else
+            echo "✅ Found existing Flutter project: $PROJECT_DIR"
+          fi
+          
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+
       - name: Install Dependencies
         run: flutter pub get
+        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Build APK
         run: flutter build apk --release
+        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: flutter-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: ${{ env.PROJECT_DIR }}/build/app/outputs/flutter-apk/app-release.apk
