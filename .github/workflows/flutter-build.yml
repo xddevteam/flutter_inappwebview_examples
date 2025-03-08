@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
@@ -16,14 +16,14 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
+          flutter-version: 'stable'
 
       - name: Find or Create Flutter Project
         id: setup_project
         run: |
           echo "🔍 Checking for existing Flutter project..."
-          PROJECT_DIR=$(find . -name "pubspec.yaml" -exec dirname {} \;)
-          
+          PROJECT_DIR=$(find . -name "pubspec.yaml" | head -n 1 | xargs dirname)
+
           if [ -z "$PROJECT_DIR" ]; then
             echo "⚠️ No Flutter project found! Creating a new one..."
             flutter create my_flutter_app
@@ -31,7 +31,7 @@ jobs:
           else
             echo "✅ Found existing Flutter project: $PROJECT_DIR"
           fi
-          
+
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
 
       - name: Install Dependencies
@@ -43,7 +43,7 @@ jobs:
         working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: flutter-apk
           path: ${{ env.PROJECT_DIR }}/build/app/outputs/flutter-apk/app-release.apk
